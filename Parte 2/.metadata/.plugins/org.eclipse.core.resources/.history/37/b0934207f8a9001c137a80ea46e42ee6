@@ -1,0 +1,67 @@
+package com.genpact.folderwatcher;
+
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.List;
+
+public class Main {
+
+	public void watch() throws Exception{
+		//Create watcher object
+		WatchService watcher = FileSystems.getDefault().newWatchService();
+		Path dir = Paths.get(""); //path of folder to monitor
+		
+		//events to monitor, ie. new file, modify file or delete file
+		dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+		System.out.println("Monitoring folder: " + dir.getFileName());
+		
+		while (true) {
+			WatchKey key;
+			key = watcher.take();
+			
+			List<WatchEvent<?>> eventList = key.pollEvents();
+			
+			for (WatchEvent<?> event : eventList) {
+				//get type of event
+				Kind<?> eventType = event.kind();
+				
+				//get file name
+				Path fileName = (Path)event.context();
+				
+				System.out.println(eventType.name() + ": " + fileName);
+				
+				if (eventType == StandardWatchEventKinds.OVERFLOW) {
+					continue;
+				} else if(eventType == StandardWatchEventKinds.ENTRY_CREATE) {
+					
+				} else if (eventType == StandardWatchEventKinds.ENTRY_DELETE) {
+					
+				} else if (eventType == StandardWatchEventKinds.ENTRY_MODIFY) {
+					
+				}
+				
+			}
+			
+			//reset key to avoid loop
+			boolean valid = key.reset();
+			if (!valid) {
+				break;
+			}
+			
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		
+		Main app = new Main();
+		app.watch();
+
+	}
+
+}
